@@ -3,4 +3,4 @@ sudo: false
 node_js:
   - "4.2"
 after_success:
-  - ./bin/codecov -e TRAVIS_NODE_VERSION
+  - ./node_modules/.bin/codecov

@@ -138,6 +138,7 @@ suite('pjs.compile(str, options)', function () {
 });
 
 return;
+// Try Travis
 
 suite('pjs.render(str, data, opts)', function () {
   test('render the template', function () {
