@@ -20,7 +20,7 @@ var template = pjs.compile(str, options);
 template(data, function (err, html) { /* ... */ });
 ```
 
-With **Express.js (3 & 4)**:
+With **Express.js** (3 & 4):
 ```js
 app.engine('pjs', require('pjs-template').__express);
 app.set('view engine', 'pjs');
