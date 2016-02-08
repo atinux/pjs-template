@@ -4,7 +4,8 @@
   "description": "Pajamas.js Template (pjs-template) - EJS with async rendering",
   "main": "lib/pjs.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "cover": "istanbul cover ./node_modules/mocha/bin/_mocha -- -R spec && ./node_modules/.bin/codecov"
   },
   "repository": {
     "type": "git",
@@ -27,5 +28,9 @@
   "dependencies": {
     "trycatch": "^1.5.21"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "async": "^1.5.2",
+    "istanbul": "^0.4.2",
+    "mocha": "^2.4.5"
+  }
 }
