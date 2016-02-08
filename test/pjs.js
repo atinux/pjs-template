@@ -42,6 +42,11 @@ function fixture(name) {
   return read('test/fixtures/' + name, 'utf8');
 }
 
+
+// Remove White Chars
+function noWC(str) {
+  return String(str).replace(/\r/g, '').replace(/^\s+|\s+$/mg, '').replace(/\n/g, '');
+}
 /**
  * User fixtures.
  */
@@ -55,17 +60,17 @@ suite('pjs.compile(str, options)', function () {
   test('compile to a function', function (done) {
     var fn = pjs.compile('<p>yay</p>');
     assert.equal(typeof fn, 'function');
-    fn(function (err, html) {
+    fn(function (err, out) {
       assert.equal(err, null);
-      assert.equal(html, '<p>yay</p>');
+      assert.equal(out, '<p>yay</p>');
       done();
     });
   });
 
   test('empty input works', function (done) {
     var fn = pjs.compile('');
-    fn(function (err, html) {
-      assert.equal(html, '');
+    fn(function (err, out) {
+      assert.equal(out, '');
       done();
     });
   });
@@ -95,18 +100,18 @@ suite('pjs.compile(str, options)', function () {
         fn = pjs.compile('<p><?= name ?></p>', {delimiter: '?'});
         fn({ name: 'geddy' }, next);
       },
-      function (html, next) {
-        assert.equal(html, '<p>geddy</p>');
+      function (out, next) {
+        assert.equal(out, '<p>geddy</p>');
         fn = pjs.compile('<p><:= name :></p>', {delimiter: ':'});
         fn({ name: 'geddy' }, next);
       },
-      function (html, next) {
-        assert.equal(html, '<p>geddy</p>');
+      function (out, next) {
+        assert.equal(out, '<p>geddy</p>');
         fn = pjs.compile('<p><$= name $></p>', {delimiter: '$'});
         fn({ name: 'geddy' }, next);
       },
-      function (html, next) {
-        assert.equal(html, '<p>geddy</p>');
+      function (out, next) {
+        assert.equal(out, '<p>geddy</p>');
         next();
       }
     ], done);
@@ -116,11 +121,11 @@ suite('pjs.compile(str, options)', function () {
     var fn;
     pjs.delimiter = '&';
     fn = pjs.compile('<p><&= name &></p>');
-    fn({name: 'geddy'}, function (err, html) {
-      assert.equal(html, '<p>geddy</p>');
+    fn({name: 'geddy'}, function (err, out) {
+      assert.equal(out, '<p>geddy</p>');
       fn = pjs.compile('<p><|= name |></p>', {delimiter: '|'});
-      fn({name: 'geddy'}, function (err, html) {
-        assert.equal(html, '<p>geddy</p>');
+      fn({name: 'geddy'}, function (err, out) {
+        assert.equal(out, '<p>geddy</p>');
         delete pjs.delimiter;
         done();
       });
@@ -137,212 +142,162 @@ suite('pjs.compile(str, options)', function () {
   });
 });
 
-return;
-// Try Travis
-
 suite('pjs.render(str, data, opts)', function () {
-  test('render the template', function () {
-    assert.equal(pjs.render('<p>yay</p>'), '<p>yay</p>');
+  test('render the template', function (done) {
+    pjs.render('<p>yay</p>', function (err, out) {
+      assert.equal(err, null);
+      assert.equal(out, '<p>yay</p>');
+      done();
+    });
   });
 
-  test('empty input works', function () {
-    assert.equal(pjs.render(''), '');
+  test('empty input works', function (done) {
+    pjs.render('', function (err, out) {
+      assert.equal(out, '');
+      done();
+    });
   });
 
-  test('undefined renders nothing escaped', function () {
-    assert.equal(pjs.render('<%= undefined %>'), '');
+  test('undefined renders nothing escaped', function (done) {
+    pjs.render('<%= undefined %>', function (err, out) {
+      assert.equal(out, '');
+      done();
+    });
   });
 
-  test('undefined renders nothing raw', function () {
-    assert.equal(pjs.render('<%- undefined %>'), '');
+  test('undefined renders nothing raw', function (done) {
+    pjs.render('<%- undefined %>', function (err, out) {
+      assert.equal(out, '');
+      done();
+    });
   });
 
-  test('null renders nothing escaped', function () {
-    assert.equal(pjs.render('<%= null %>'), '');
+  test('null renders nothing escaped', function (done) {
+    pjs.render('<%= null %>', function (err, out) {
+      assert.equal(out, '');
+      done();
+    });
   });
 
-  test('null renders nothing raw', function () {
-    assert.equal(pjs.render('<%- null %>'), '');
+  test('null renders nothing raw', function (done) {
+    pjs.render('<%- null %>', function (err, out) {
+      assert.equal(out, '');
+      done();
+    });
   });
 
-  test('zero-value data item renders something escaped', function () {
-    assert.equal(pjs.render('<%= 0 %>'), '0');
+  test('zero-value data item renders something escaped', function (done) {
+    pjs.render('<%= 0 %>', function (err, out) {
+      assert.equal(out, '0');
+      done();
+    });
   });
 
-  test('zero-value data object renders something raw', function () {
-    assert.equal(pjs.render('<%- 0 %>'), '0');
+  test('zero-value data object renders something raw', function (done) {
+    pjs.render('<%- 0 %>', function (err, out) {
+      assert.equal(out, 0);
+      done();
+    });
   });
 
-  test('accept locals', function () {
-    assert.equal(pjs.render('<p><%= name %></p>', {name: 'geddy'}),
-        '<p>geddy</p>');
+  test('data object renders something raw', function (done) {
+    pjs.render('<%- { foo: true } %>', function (err, out) {
+      assert.equal(typeof out, 'object');
+      assert.ok(out.foo)
+      done();
+    });
   });
 
-  test('accept locals without using with() {}', function () {
-    assert.equal(pjs.render('<p><%= locals.name %></p>', {name: 'geddy'},
-                            {_with: false}),
-        '<p>geddy</p>');
-    assert.throws(function() {
-      pjs.render('<p><%= name %></p>', {name: 'geddy'},
-                 {_with: false});
-    }, /name is not defined/);
+  test('data object renders something raw with EOL', function (done) {
+    pjs.render('\n<%- { bar: 10 } %>\n', function (err, out) {
+      assert.equal(typeof out, 'object');
+      assert.equal(out.bar, 10)
+      done();
+    });
   });
 
-  test('accept custom name for locals', function () {
-    pjs.localsName = 'it';
-    assert.equal(pjs.render('<p><%= it.name %></p>', {name: 'geddy'},
-                            {_with: false}),
-        '<p>geddy</p>');
-    assert.throws(function() {
-      pjs.render('<p><%= name %></p>', {name: 'geddy'},
-                 {_with: false});
-    }, /name is not defined/);
-    pjs.localsName = 'locals';
+  test('accept locals', function (done) {
+    pjs.render('<p><%= name %></p>', { name: 'geddy' }, function (err, out) {
+      assert.equal(out, '<p>geddy</p>');
+      done();
+    });
   });
 
-  test('support caching', function () {
+  test('support caching', function (done) {
     var file = __dirname + '/tmp/render.pjs'
-      , options = {cache: true, filename: file}
-      , out = pjs.render('<p>Old</p>', {}, options)
+      , options = { cache: true, filename: file };
+
+    async.waterfall([
+      function (next) {
+        pjs.render('<p>Old</p>', {}, options, next);
+      },
+      function (out, next) {
+        assert.equal(out, '<p>Old</p>');
+        pjs.render('<p>New</p>', {}, options, next);
+      },
+      function (out, next) {
+        // Assert no change, still in cache
+        assert.equal(out, '<p>Old</p>');
+        // Clear cache
+        pjs.clearCache();
+        // Render again
+        pjs.render('<p>New</p>', {}, options, next);
+      },
+      function (out, next) {
+        // Assert no change, still in cache
+        assert.equal(out, '<p>New</p>');
+        pjs.clearCache();
+        next();
+      }
+    ], done);
+  });
+
+  test('no error if caching and watchFiles but no real file', function (done) {
+    var file = __dirname + '/tmp/render2.pjs'
+      , options = { cache: true, watchFiles: true, filename: file }
       , expected = '<p>Old</p>';
-    assert.equal(out, expected);
-    // Assert no change, still in cache
-    out = pjs.render('<p>New</p>', {}, options);
-    assert.equal(out, expected);
+
+    pjs.render('<p>Old</p>', {}, options, function (err, out) {
+      assert.equal(err, null);
+      assert.equal(out, expected);
+      // Assert no change, still in cache
+      pjs.render('<p>New</p>', {}, options, function (err, out) {
+        assert.equal(err, null);
+        assert.equal(out, expected);
+        done();
+      });
+    });
   });
 
-  test('support LRU caching', function () {
-    var oldCache = pjs.cache
-      , file = __dirname + '/tmp/render.pjs'
-      , options = {cache: true, filename: file}
-      , out
-      , expected = '<p>Old</p>';
-
-    // Switch to LRU
-    pjs.cache = LRU();
-
-    out = pjs.render('<p>Old</p>', {}, options);
-    assert.equal(out, expected);
-    // Assert no change, still in cache
-    out = pjs.render('<p>New</p>', {}, options);
-    assert.equal(out, expected);
-
-    // Restore system cache
-    pjs.cache = oldCache;
-  });
-
-  test('opts.context', function () {
-    var ctxt = {foo: 'FOO'}
-      , out = pjs.render('<%= this.foo %>', {}, {context: ctxt});
-    assert.equal(out, ctxt.foo);
-  });
 });
 
 suite('pjs.renderFile(path, [data], [options], fn)', function () {
   test('render a file', function(done) {
-    pjs.renderFile('test/fixtures/para.pjs', function(err, html) {
-      if (err) {
-        return done(err);
-      }
-      assert.equal(html, '<p>hey</p>\n');
+    pjs.renderFile('test/fixtures/para.pjs', function(err, out) {
+      assert.equal(out, '<p>hey</p>');
       done();
     });
   });
 
   test('accept locals', function(done) {
-    var data =  {name: 'fonebone'}
-      , options = {delimiter: '$'};
-    pjs.renderFile('test/fixtures/user.pjs', data, options, function(err, html) {
-      if (err) {
-        return done(err);
-      }
-      assert.equal(html, '<h1>fonebone</h1>\n');
+    var data =  { name: 'fonebone' }
+      , options = { delimiter: '$' };
+    pjs.renderFile('test/fixtures/user.pjs', data, options, function(err, out) {
+      assert.equal(out, '<h1>fonebone</h1>');
       done();
     });
   });
 
-  test('accept locals without using with() {}', function(done) {
-    var data =  {name: 'fonebone'}
-      , options = {delimiter: '$', _with: false}
-      , doneCount = 0;
-    pjs.renderFile('test/fixtures/user-no-with.pjs', data, options,
-                   function(err, html) {
-      if (err) {
-        if (doneCount === 2) {
-          return;
-        }
-        doneCount = 2;
-        return done(err);
-      }
-      assert.equal(html, '<h1>fonebone</h1>\n');
-      doneCount++;
-      if (doneCount === 2) {
-        done();
-      }
-    });
-    pjs.renderFile('test/fixtures/user.pjs', data, options, function(err) {
-      if (!err) {
-        if (doneCount === 2) {
-          return;
-        }
-        doneCount = 2;
-        return done(new Error('error not thrown'));
-      }
-      doneCount++;
-      if (doneCount === 2) {
-        done();
-      }
-    });
-  });
-
-  test('not catch err thrown by callback', function(done) {
-    var data =  {name: 'fonebone'}
-      , options = {delimiter: '$'}
-      , counter = 0;
-
-    var d = require('domain').create();
-    d.on('error', function (err) {
-      assert.equal(counter, 1);
-      assert.equal(err.message, 'Exception in callback');
-      done();
-    });
-    d.run(function () {
-      // process.nextTick() needed to work around mochajs/mocha#513
-      //
-      // tl;dr: mocha doesn't support synchronous exception throwing in
-      // domains. Have to make it async. Ticket closed because: "domains are
-      // deprecated :D"
-      process.nextTick(function () {
-        pjs.renderFile('test/fixtures/user.pjs', data, options,
-                       function(err) {
-          counter++;
-          if (err) {
-            assert.notEqual(err.message, 'Exception in callback');
-            return done(err);
-          }
-          throw new Error('Exception in callback');
-        });
-      });
-    });
-  });
-
-  test('support caching', function (done) {
+  test('support basic caching', function (done) {
     var expected = '<p>Old</p>'
       , file = __dirname + '/tmp/renderFile.pjs'
-      , options = {cache: true};
-    fs.writeFileSync(file, '<p>Old</p>');
+      , options = { cache: true };
 
+    fs.writeFileSync(file, '<p>Old</p>');
     pjs.renderFile(file, {}, options, function (err, out) {
-      if (err) {
-        done(err);
-      }
       fs.writeFileSync(file, '<p>New</p>');
       assert.equal(out, expected);
-
       pjs.renderFile(file, {}, options, function (err, out) {
-        if (err) {
-          done(err);
-        }
         // Assert no change, still in cache
         assert.equal(out, expected);
         done();
@@ -350,120 +305,75 @@ suite('pjs.renderFile(path, [data], [options], fn)', function () {
     });
   });
 
-  test('opts.context', function (done) {
-    var ctxt = {foo: 'FOO'};
-    pjs.renderFile('test/fixtures/with-context.pjs', {},
-          {context: ctxt}, function(err, html) {
-      if (err) {
-        return done(err);
-      }
-      assert.equal(html, ctxt.foo + '\n');
-      done();
-    });
+  test('support smart caching (watchFiles: true)', function (done) {
+    var file = __dirname + '/tmp/renderFile.pjs'
+      , options = { cache: true, watchFiles: true };
 
+    pjs.clearCache();
+    fs.writeFileSync(file, '<p>Old #2</p>');
+    pjs.renderFile(file, {}, options, function (err, out) {
+      assert.equal(out, '<p>Old #2</p>');
+      // async write for updates
+      fs.writeFile(file, '<p>New #2</p>', function (err) {
+        assert.equal(null, err);
+        pjs.renderFile(file, {}, options, function (err, out) {
+          assert.equal(out, '<p>New #2</p>');
+          done();
+        });
+      });
+    });
   });
+
 });
 
 suite('cache specific', function () {
-  test('`clearCache` work properly', function () {
+  test('`clearCache` work properly', function (done) {
     var expected = '<p>Old</p>'
       , file = __dirname + '/tmp/clearCache.pjs'
-      , options = {cache: true, filename: file}
-      , out = pjs.render('<p>Old</p>', {}, options);
-    assert.equal(out, expected);
+      , options = {cache: true, filename: file};
 
-    pjs.clearCache();
-
-    expected = '<p>New</p>';
-    out = pjs.render('<p>New</p>', {}, options);
-    assert.equal(out, expected);
-  });
-
-  test('`clearCache` work properly, LRU', function () {
-    var expected = '<p>Old</p>'
-      , oldCache = pjs.cache
-      , file = __dirname + '/tmp/clearCache.pjs'
-      , options = {cache: true, filename: file}
-      , out;
-
-    pjs.cache = LRU();
-
-    out = pjs.render('<p>Old</p>', {}, options);
-    assert.equal(out, expected);
-    pjs.clearCache();
-    expected = '<p>New</p>';
-    out = pjs.render('<p>New</p>', {}, options);
-    assert.equal(out, expected);
-
-    pjs.cache = oldCache;
-  });
-
-  test('LRU with cache-size 1', function () {
-    var oldCache = pjs.cache
-      , options
-      , out
-      , expected
-      , file;
-
-    pjs.cache = LRU(1);
-
-    file = __dirname + '/tmp/render1.pjs';
-    options = {cache: true, filename: file};
-    out = pjs.render('<p>File1</p>', {}, options);
-    expected = '<p>File1</p>';
-    assert.equal(out, expected);
-
-    // Same filename, different template, but output
-    // should be the same because cache
-    file = __dirname + '/tmp/render1.pjs';
-    options = {cache: true, filename: file};
-    out = pjs.render('<p>ChangedFile1</p>', {}, options);
-    expected = '<p>File1</p>';
-    assert.equal(out, expected);
-
-    // Different filiename -- output should be different,
-    // and previous cache-entry should be evicted
-    file = __dirname + '/tmp/render2.pjs';
-    options = {cache: true, filename: file};
-    out = pjs.render('<p>File2</p>', {}, options);
-    expected = '<p>File2</p>';
-    assert.equal(out, expected);
-
-    // Entry with first filename should now be out of cache,
-    // results should be different
-    file = __dirname + '/tmp/render1.pjs';
-    options = {cache: true, filename: file};
-    out = pjs.render('<p>ChangedFile1</p>', {}, options);
-    expected = '<p>ChangedFile1</p>';
-    assert.equal(out, expected);
-
-    pjs.cache = oldCache;
+    pjs.render('<p>Old</p>', {}, options, function (err, out) {
+      assert.equal(out, expected);
+      pjs.clearCache();
+      expected = '<p>New</p>';
+      pjs.render('<p>New</p>', {}, options, function (err, out) {
+        assert.equal(out, expected);
+        done();
+      });
+    });
   });
 });
 
 suite('<%', function () {
-  test('without semicolons', function () {
-    assert.equal(pjs.render(fixture('no.semicolons.pjs')),
-        fixture('no.semicolons.html'));
+  test('without semicolons', function (done) {
+    pjs.render(fixture('no.semicolons.pjs'), function (err, out) {
+      assert.equal(noWC(out), noWC(fixture('no.semicolons.html')));
+      done();
+    });
   });
 });
 
 suite('<%=', function () {
-  test('escape &amp;<script>', function () {
-    assert.equal(pjs.render('<%= name %>', {name: '&nbsp;<script>'}),
-        '&amp;nbsp;&lt;script&gt;');
+  test('escape &amp;<script>', function (done) {
+    pjs.render('<%= name %>', {name: '&nbsp;<script>'}, function (err, out) {
+      assert.equal(out, '&amp;nbsp;&lt;script&gt;');
+      done();
+    });
   });
-
-  test('should escape \'', function () {
-    assert.equal(pjs.render('<%= name %>', {name: 'The Jones\'s'}),
-      'The Jones&#39;s');
+  test('should escape \'', function (done) {
+    pjs.render('<%= name %>', {name: 'The Jones\'s'}, function (err, out) {
+      assert.equal(out, 'The Jones&#39;s');
+      done();
+    });
   });
-
-  test('should escape &foo_bar;', function () {
-    assert.equal(pjs.render('<%= name %>', {name: '&foo_bar;'}),
-      '&amp;foo_bar;');
+  test('should escape &foo_bar;', function (done) {
+    pjs.render('<%= name %>', {name: '&foo_bar;'}, function (err, out) {
+      assert.equal(out, '&amp;foo_bar;');
+      done();
+    });
   });
 });
+return;
 
 suite('<%-', function () {
   test('not escape', function () {
