@@ -20,10 +20,15 @@ var template = pjs.compile(str, options);
 template(data, function (err, html) { /* ... */ });
 ```
 
-With **Express.js** (3 & 4):
+With **Express.js**:
 ```js
 app.engine('pjs', require('pjs-template').__express);
 app.set('view engine', 'pjs');
+// You can use 'view options' to set the pjs options
+app.set('view options', {
+  cache: true,
+  delimiter: '$'
+});
 ```
 
 ## Example
@@ -44,7 +49,7 @@ Render the file:
 ```js
 var pjs = require('pjs-template');
 
-pjs.renderFile('./template.pjs', { foo: "bar" }, function (err, html) {
+pjs.renderFile('./hello.pjs', { foo: "bar" }, function (err, html) {
   console.log(html);
   // Display: Hello PJS!
 });
@@ -52,11 +57,18 @@ pjs.renderFile('./template.pjs', { foo: "bar" }, function (err, html) {
 
 The `done()` method tell PJS that it's an async block and to wait until done() is called.
 
+If your block is not asynchronous, you don't need to use it:
+```js
+<% var foo = 'bar'; %>
+Hello <%= foo %>!
+```
+
+Will display `Hello bar!`
+
 ## Options
 - `cache` (boolean) - Compiled functions are cached, requires `filename` option when used with the `render` method
 - `filename` - Used by cache to key caches, and for includes
-- `watchFiles` (boolean) - Require `cache: true`, watch for changes on the cached files to clear their cache
-- `context` - Function execution context
+- `watchFiles` (boolean) - Require `cache: true`, watch for changes on the cached files to clear their cache automatically
 - `debug` - Output generated function body
 - `compileDebug` - When false no debug instrumentation is compiled
 - `delimiter` - Character to use with angle brackets for open/close
@@ -98,6 +110,13 @@ pjs.render('<$= users.join(" | "); $>', { users: users }, function (err, html) {
 });
 ```
 
+## Methods
+- pjs.renderFile(path [, data] [, opts], callback)
+- pjs.render(str [, data] [, opts], callback)
+- pjs.compile(str [, opts])
+- pjs.clearCache()
+- pjs.escape(html)
+
 ## Todos
-- Express compatibility
-- Tests
+- Tests with Mocha and Istanbul for coverage
+- Npm badge, Travis, Bithound + Issues Stats
