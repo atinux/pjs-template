@@ -1,6 +1,7 @@
 # Pajamas.js Template (pjs-template)
 
-[![npm version](https://badge.fury.io/js/pjs-template.svg)](https://badge.fury.io/js/pjs-template) [![Build Status](https://travis-ci.org/Atinux/pjs-template.svg?branch=master)](https://travis-ci.org/Atinux/pjs-template) [![codecov.io](https://codecov.io/github/Atinux/pjs-template/coverage.svg?branch=master)](https://codecov.io/github/Atinux/pjs-template?branch=master) [![bitHound Code](https://www.bithound.io/github/Atinux/pjs-template/badges/code.svg)](https://www.bithound.io/github/Atinux/pjs-template)
+[![npm version](https://badge.fury.io/js/pjs-template.svg)](https://badge.fury.io/js/pjs-template) [![Dependencies](https://david-dm.org/Atinux/pjs-template.svg)](https://david-dm.org/Atinux/pjs-template) [![Build Status](https://travis-ci.org/Atinux/pjs-template.svg?branch=master)](https://travis-ci.org/Atinux/pjs-template) [![codecov.io](https://codecov.io/github/Atinux/pjs-template/coverage.svg?branch=master)](https://codecov.io/github/Atinux/pjs-template?branch=master) [![bitHound Code](https://www.bithound.io/github/Atinux/pjs-template/badges/code.svg)](https://www.bithound.io/github/Atinux/pjs-template)
+
 
 An async rendering template engine used by [Pajamas.js](https://github.com/Atinux/pjs).
 PJS syntax is based on [EJS](https://github.com/mde/ejs) and can handle asynchronous templates easily.
