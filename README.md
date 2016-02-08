@@ -1,7 +1,7 @@
 # Pajamas.js Template (pjs-template)
 
 An async rendering template engine used by [Pajamas.js](https://github.com/Atinux/pjs).
-PJS syntax is based on [EJS](http://ejs.co) and can handle asynchronous templates easily.
+PJS syntax is based on [EJS](https://github.com/mde/ejs) and can handle asynchronous templates easily.
 
 ## Installation
 
