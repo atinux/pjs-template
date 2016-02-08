@@ -70,7 +70,7 @@ The `done()` method tell PJS that it's an async block and to wait until done() i
 - `<%%` Outputs a literal '<%'
 - `%>` Plain ending tag
 - `-%>` Trim-mode ('newline slurp') tag, trims following newline
-- 
+
 ## Includes
 
 Includes are relatives to the template with the `include` call.
