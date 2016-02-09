@@ -1,9 +1,12 @@
-# Pajamas.js Template (pjs-template)
+![pjs-template](https://cloud.githubusercontent.com/assets/904724/12922847/1045894c-cf4b-11e5-9679-d8baa6a89c6e.png)
 
-[![npm version](https://badge.fury.io/js/pjs-template.svg)](https://badge.fury.io/js/pjs-template) [![Dependencies](https://david-dm.org/Atinux/pjs-template.svg)](https://david-dm.org/Atinux/pjs-template) [![Build Status](https://travis-ci.org/Atinux/pjs-template.svg?branch=master)](https://travis-ci.org/Atinux/pjs-template) [![codecov.io](https://codecov.io/github/Atinux/pjs-template/coverage.svg?branch=master)](https://codecov.io/github/Atinux/pjs-template?branch=master) [![bitHound Code](https://www.bithound.io/github/Atinux/pjs-template/badges/code.svg)](https://www.bithound.io/github/Atinux/pjs-template)
+<p align="center">
+<a href="https://badge.fury.io/js/pjs-template"><img alt="npm version" src="https://badge.fury.io/js/pjs-template.svg"/></a> <a href="https://david-dm.org/Atinux/pjs-template"><img alt="Dependencies" src="https://david-dm.org/Atinux/pjs-template.svg"/></a> <a href="https://travis-ci.org/Atinux/pjs-template"><img alt="Build Status" src="https://travis-ci.org/Atinux/pjs-template.svg?branch=master"/></a>
+<br>
+<a href="https://codecov.io/github/Atinux/pjs-template?branch=master"><img alt="Code Coverage" src="https://codecov.io/github/Atinux/pjs-template/coverage.svg?branch=master"/></a> <a href="https://www.bithound.io/github/Atinux/pjs-template"><img alt="Code Review" src="https://www.bithound.io/github/Atinux/pjs-template/badges/code.svg"/></a>
+</p>
 
-
-An async rendering template engine used by [Pajamas.js](https://github.com/Atinux/pjs).
+An async rendering template engine used by [Pajamas](https://github.com/Atinux/pjs).
 PJS syntax is based on [EJS](https://github.com/mde/ejs) and can handle asynchronous templates easily.
 
 ## Installation
