@@ -1,4 +1,6 @@
-![pjs-template](https://cloud.githubusercontent.com/assets/904724/12922847/1045894c-cf4b-11e5-9679-d8baa6a89c6e.png)
+<p align="center">
+<img alt="PJS Template - An asynchronous templating engine" src="https://cloud.githubusercontent.com/assets/904724/12922847/1045894c-cf4b-11e5-9679-d8baa6a89c6e.png"/>
+</p>
 
 <p align="center">
 <a href="https://badge.fury.io/js/pjs-template"><img alt="npm version" src="https://badge.fury.io/js/pjs-template.svg"/></a> <a href="https://david-dm.org/Atinux/pjs-template"><img alt="Dependencies" src="https://david-dm.org/Atinux/pjs-template.svg"/></a> <a href="https://travis-ci.org/Atinux/pjs-template"><img alt="Build Status" src="https://travis-ci.org/Atinux/pjs-template.svg?branch=master"/></a> 
