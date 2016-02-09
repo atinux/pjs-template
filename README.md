@@ -1,5 +1,5 @@
 <p align="center">
-<img alt="PJS Template - An asynchronous templating engine" src="https://cloud.githubusercontent.com/assets/904724/12923808/0b54f3ce-cf4f-11e5-8650-829fe80a059e.png"/>
+<img alt="PJS Template - An asynchronous templating engine" src="https://cloud.githubusercontent.com/assets/904724/12923844/341853e6-cf4f-11e5-92bd-5d31d472c497.png"/>
 </p>
 
 <p align="center">
