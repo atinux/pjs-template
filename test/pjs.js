@@ -318,7 +318,11 @@ suite('pjs.renderFile(path, [data], [options], fn)', function () {
         assert.equal(null, err);
         pjs.renderFile(file, {}, options, function (err, out) {
           assert.equal(out, '<p>New #2</p>');
-          done();
+          // File already watched but without changed, same result
+          pjs.renderFile(file, {}, options, function (err, out) {
+            assert.equal(out, '<p>New #2</p>');
+            done();
+          });
         });
       });
     });
