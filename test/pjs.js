@@ -4,12 +4,12 @@
  * Module dependencies.
  */
 
-var pjs = require('..')
-  , fs = require('fs')
-  , read = fs.readFileSync
-  , assert = require('assert')
-  , path = require('path')
-  , async = require('async');
+var pjs = require('..'),
+    fs = require('fs'),
+    read = fs.readFileSync,
+    assert = require('assert'),
+    path = require('path'),
+    async = require('async');
 
 try {
   fs.mkdirSync(__dirname + '/tmp');
