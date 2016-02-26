@@ -5,6 +5,7 @@
  */
 
 var pjs = require('..'),
+    utils = require('../lib/utils'),
     fs = require('fs'),
     read = fs.readFileSync,
     assert = require('assert'),
@@ -682,11 +683,19 @@ suite('preprocessor include', function () {
     });
   });
 });
+
 suite('comments', function () {
   test('fully render with comments removed', function (done) {
     pjs.render(fixture('comments.pjs'), function (err, out) {
       assert.equal(noWC(out), noWC(fixture('comments.html')));
       done();
     });
+  });
+});
+
+suite('utils', function () {
+  test('shallowCopy9(to, from) without from', function () {
+    var obj = utils.shallowCopy({ foo: true });
+    assert.equal(obj.foo, true);
   });
 });
