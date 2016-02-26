@@ -279,11 +279,35 @@ suite('pjs.renderFile(path, [data], [options], fn)', function () {
     });
   });
 
+  test('Support Express 3 options via data', function (done) {
+    pjs.renderFile('test/fixtures/express-options.pjs', { delimiter: '@', foo: 'PJS' }, function (err, out) {
+      assert.equal(out, '<p>Hello PJS!</p>');
+      done();
+    });
+  });
+
+  test('Support Express 4 options via data', function (done) {
+    var data = { foo: 'PJS' };
+    data.settings = {};
+    data.settings['view options'] = { delimiter: '@' };
+    pjs.renderFile('test/fixtures/express-options.pjs', data, function (err, out) {
+      assert.equal(out, '<p>Hello PJS!</p>');
+      done();
+    });
+  });
+
   test('accept locals', function(done) {
     var data =  { name: 'fonebone' },
         options = { delimiter: '$' };
     pjs.renderFile('test/fixtures/user.pjs', data, options, function(err, out) {
       assert.equal(out, '<h1>fonebone</h1>');
+      done();
+    });
+  });
+
+  test('No cache without filename', function (done) {
+    pjs.render('<p>Hello</p>', {}, { cache: true }, function (err, out) {
+      assert.ok(err.message.indexOf('cache option requires a filename') > -1);
       done();
     });
   });
