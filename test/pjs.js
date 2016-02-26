@@ -373,18 +373,18 @@ suite('<%=', function () {
     });
   });
 });
-return;
 
 suite('<%-', function () {
-  test('not escape', function () {
-    assert.equal(pjs.render('<%- name %>', {name: '<script>'}),
-        '<script>');
+  test('not escape', function (done) {
+    pjs.render('<%- name %>', { name: '<script>' }, function (err, out) {
+      assert.equal(out, '<script>');
+      done();
+    });
   });
 
   test('terminate gracefully if no close tag is found', function () {
     try {
       pjs.compile('<h1>oops</h1><%- name ->');
-      throw new Error('Expected parse failure');
     }
     catch (err) {
       assert.ok(err.message.indexOf('Could not find matching close tag for') > -1);
@@ -393,39 +393,41 @@ suite('<%-', function () {
 });
 
 suite('%>', function () {
-  test('produce newlines', function () {
-    assert.equal(pjs.render(fixture('newlines.pjs'), {users: users}),
-      fixture('newlines.html'));
+  test('produce newlines', function (done) {
+    pjs.render(fixture('newlines.pjs'), {users: users}, function (err, out) {
+      assert.equal(noWC(out), noWC(fixture('newlines.html')));
+      done();
+    });
   });
-  test('works with `-%>` interspersed', function () {
-    assert.equal(pjs.render(fixture('newlines.mixed.pjs'), {users: users}),
-      fixture('newlines.mixed.html'));
+  test('works with `-%>` interspersed', function (done) {
+    pjs.render(fixture('newlines.mixed.pjs'), {users: users}, function (err, out) {
+      assert.equal(noWC(out), noWC(fixture('newlines.mixed.html')));
+      done();
+    });
   });
-  test('consecutive tags work', function () {
-    assert.equal(pjs.render(fixture('consecutive-tags.pjs')),
-      fixture('consecutive-tags.html'));
+  test('consecutive tags work', function (done) {
+    pjs.render(fixture('consecutive-tags.pjs'), function (err, out) {
+      assert.equal(noWC(out), noWC(fixture('consecutive-tags.html')));
+      done();
+    });
   });
 });
 
 suite('-%>', function () {
-  test('not produce newlines', function () {
-    assert.equal(pjs.render(fixture('no.newlines.pjs'), {users: users}),
-      fixture('no.newlines.html'));
+  test('not produce newlines', function (done) {
+    pjs.render(fixture('no.newlines.pjs'), {users: users}, function (err, out) {
+      assert.equal(noWC(out), noWC(fixture('no.newlines.html')));
+      done();
+    });
   });
-  test('stack traces work', function () {
-    try {
-      pjs.render(fixture('no.newlines.error.pjs'));
-    }
-    catch (e) {
-      if (e.message.indexOf('>> 4| <%= qdata %>') > -1) {
-        return;
-      }
-      throw e;
-    }
-    throw new Error('Expected ReferenceError');
+  test('stack traces work', function (done) {
+    pjs.render(fixture('no.newlines.error.pjs'), function (err, out) {
+      assert.notEqual(err.message.indexOf('>> 4| <%= qdata %>'), -1)
+      done();
+    });
   });
 
-  test('works with unix style', function () {
+  test('works with unix style', function (done) {
     var content = "<ul><% -%>\n"
     + "<% users.forEach(function(user){ -%>\n"
     + "<li><%= user.name -%></li>\n"
@@ -435,11 +437,13 @@ suite('-%>', function () {
     var expectedResult = "<ul><li>geddy</li>\n<li>neil</li>\n<li>alex</li>\n</ul>";
     var fn;
     fn = pjs.compile(content);
-    assert.equal(fn({users: users}),
-      expectedResult);
+    fn({users: users}, function (err, out) {
+      assert.equal(out, expectedResult);
+      done();
+    });
   });
 
-  test('works with windows style', function () {
+  test('works with windows style', function (done) {
     var content = "<ul><% -%>\r\n"
     + "<% users.forEach(function(user){ -%>\r\n"
     + "<li><%= user.name -%></li>\r\n"
@@ -449,274 +453,155 @@ suite('-%>', function () {
     var expectedResult = "<ul><li>geddy</li>\r\n<li>neil</li>\r\n<li>alex</li>\r\n</ul>";
     var fn;
     fn = pjs.compile(content);
-    assert.equal(fn({users: users}),
-      expectedResult);
+    fn({users: users}, function (err, out) {
+      assert.equal(noWC(out), noWC(expectedResult));
+      done();
+    });
   });
 });
 
 suite('<%%', function () {
-  test('produce literals', function () {
-    assert.equal(pjs.render('<%%- "foo" %>'),
-      '<%- "foo" %>');
+  test('produce literals', function (done) {
+    pjs.render('<%%- "foo" %>', function (err, out) {
+      assert.equal(out, '<%- "foo" %>');
+      done();
+    });
   });
-  test('work without an end tag', function () {
-    assert.equal(pjs.render('<%%'), '<%');
-    assert.equal(pjs.render(fixture('literal.pjs'), {}, {delimiter: ' '}),
-      fixture('literal.html'));
+  test('work without an end tag', function (done) {
+    pjs.render('<%%', function (err, out) {
+      assert.equal(out, '<%');
+      done();
+    });
+  });
+  test('work without an end tag #2', function (done) {
+    pjs.render(fixture('literal.pjs'), {}, {delimiter: ' '}, function (err, out) {
+      assert.equal(noWC(out), noWC(fixture('literal.html')));
+      done();
+    });
   });
 });
 
 suite('<%_ and _%>', function () {
-  test('slurps spaces and tabs', function () {
-    assert.equal(pjs.render(fixture('space-and-tab-slurp.pjs'), {users: users}),
-      fixture('space-and-tab-slurp.html'));
+  test('slurps spaces and tabs', function (done) {
+    pjs.render(fixture('space-and-tab-slurp.pjs'), {users: users}, function (err, out) {
+      assert.equal(noWC(out), noWC(fixture('space-and-tab-slurp.html')));
+      done();
+    });
   });
 });
 
 suite('single quotes', function () {
-  test('not mess up the constructed function', function () {
-    assert.equal(pjs.render(fixture('single-quote.pjs')),
-      fixture('single-quote.html'));
+  test('not mess up the constructed function', function (done) {
+    pjs.render(fixture('single-quote.pjs'), function (err, out) {
+      assert.equal(noWC(out), noWC(fixture('single-quote.html')));
+      done();
+    });
   });
 });
 
 suite('double quotes', function () {
-  test('not mess up the constructed function', function () {
-    assert.equal(pjs.render(fixture('double-quote.pjs')),
-      fixture('double-quote.html'));
+  test('not mess up the constructed function', function (done) {
+    pjs.render(fixture('double-quote.pjs'), function (err, out) {
+      assert.equal(noWC(out), noWC(fixture('double-quote.html')));
+      done();
+    });
   });
 });
 
 suite('backslashes', function () {
-  test('escape', function () {
-    assert.equal(pjs.render(fixture('backslash.pjs')),
-      fixture('backslash.html'));
+  test('escape', function (done) {
+    pjs.render(fixture('backslash.pjs'), function (err, out) {
+      assert.equal(noWC(out), noWC(fixture('backslash.html')));
+      done();
+    });
   });
 });
 
 suite('messed up whitespace', function () {
-  test('work', function () {
-    assert.equal(pjs.render(fixture('messed.pjs'), {users: users}),
-      fixture('messed.html'));
+  test('work', function (done) {
+    pjs.render(fixture('messed.pjs'), {users: users}, function (err, out) {
+      assert.equal(noWC(out), noWC(fixture('messed.html')));
+      done();
+    });
   });
 });
 
 suite('exceptions', function () {
-  test('produce useful stack traces', function () {
-    try {
-      pjs.render(fixture('error.pjs'), {}, {filename: 'error.pjs'});
-    }
-    catch (err) {
+  test('produce useful stack traces', function (done) {
+    pjs.render(fixture('error.pjs'), {}, {filename: 'error.pjs'}, function (err, out) {
       assert.equal(err.path, 'error.pjs');
-      assert.equal(err.stack.split('\n').slice(0, 8).join('\n'), fixture('error.out'));
-      return;
-    }
-    throw new Error('no error reported when there should be');
+      assert.equal(err.message, fixture('error.out'));
+      done();
+    });
   });
-
-  test('not include fancy stack info if compileDebug is false', function () {
-    try {
-      pjs.render(fixture('error.pjs'), {}, {
-        filename: 'error.pjs',
-        compileDebug: false
-      });
-    }
-    catch (err) {
+  test('not include fancy stack info if compileDebug is false', function (done) {
+    pjs.render(fixture('error.pjs'), {}, {
+      filename: 'error.pjs',
+      compileDebug: false
+    }, function (err, out) {
       assert.ok(!err.path);
       assert.notEqual(err.stack.split('\n').slice(0, 8).join('\n'), fixture('error.out'));
-      return;
-    }
-    throw new Error('no error reported when there should be');
+      done();
+    });
   });
 
-  var unhook = null;
   test('log JS source when debug is set', function (done) {
-    var out = ''
-      , needToExit = false;
-    unhook = hook_stdio(process.stdout, function (str) {
-      out += str;
-      if (needToExit) {
-        return;
-      }
-      if (out.indexOf('__output')) {
-        needToExit = true;
-        unhook();
-        unhook = null;
-        return done();
-      }
+    var code = '';
+    var unhook = hook_stdio(process.stdout, function (str) { code += str; });
+    pjs.render(fixture('hello-world.pjs'), {}, {debug: true}, function (err, out) {
+      unhook();
+      assert.ok(code);
+      done();
     });
-    pjs.render(fixture('hello-world.pjs'), {}, {debug: true});
   });
-  teardown(function() {
-    if (!unhook) {
-      return;
-    }
-    unhook();
-    unhook = null;
-  });
-});
-
-suite('rmWhitespace', function () {
-  test('works', function () {
-    assert.equal(pjs.render(fixture('rmWhitespace.pjs'), {}, {rmWhitespace: true}),
-        fixture('rmWhitespace.html'));
-  });
-});
-
-suite('include()', function () {
-  test('include pjs', function () {
-    var file = 'test/fixtures/include-simple.pjs';
-    assert.equal(pjs.render(fixture('include-simple.pjs'), {}, {filename: file}),
-        fixture('include-simple.html'));
-  });
-
-  test('include pjs fails without `filename`', function () {
-    try {
-      pjs.render(fixture('include-simple.pjs'));
-    }
-    catch (err) {
-      assert.ok(err.message.indexOf('requires the \'filename\' option') > -1);
-      return;
-    }
-    throw new Error('expected inclusion error');
-  });
-
-  test('strips BOM', function () {
-    assert.equal(
-      pjs.render('<%- include("fixtures/includes/bom.pjs") %>',
-        {}, {filename: path.join(__dirname, 'f.pjs')}),
-      '<p>This is a file with BOM.</p>\n');
-  });
-
-  test('include pjs with locals', function () {
-    var file = 'test/fixtures/include.pjs';
-    assert.equal(pjs.render(fixture('include.pjs'), {pets: users}, {filename: file, delimiter: '@'}),
-        fixture('include.html'));
-  });
-
-  test('include pjs with absolute path and locals', function () {
-    var file = 'test/fixtures/include-abspath.pjs';
-    assert.equal(pjs.render(fixture('include-abspath.pjs'),
-      {dir: path.join(__dirname, 'fixtures'), pets: users, path: path},
-      {filename: file, delimiter: '@'}),
-        fixture('include.html'));
-  });
-
-  test('work when nested', function () {
-    var file = 'test/fixtures/menu.pjs';
-    assert.equal(pjs.render(fixture('menu.pjs'), {pets: users}, {filename: file}),
-        fixture('menu.html'));
-  });
-
-  test('work with a variable path', function () {
-    var file = 'test/fixtures/menu_var.pjs',
-        includePath = 'includes/menu-item';
-    assert.equal(pjs.render(fixture('menu.pjs'), {pets: users, varPath:  includePath}, {filename: file}),
-      fixture('menu.html'));
-  });
-
-  test('include arbitrary files as-is', function () {
-    var file = 'test/fixtures/include.css.pjs';
-    assert.equal(pjs.render(fixture('include.css.pjs'), {pets: users}, {filename: file}),
-        fixture('include.css.html'));
-  });
-
-  test('pass compileDebug to include', function () {
-    var file = 'test/fixtures/include.pjs'
-      , fn;
-    fn = pjs.compile(fixture('include.pjs'), {
-      filename: file
-    , delimiter: '@'
-    , compileDebug: false
-    });
-    try {
-      // Render without a required variable reference
-      fn({foo: 'asdf'});
-    }
-    catch(e) {
-      assert.equal(e.message, 'pets is not defined');
-      assert.ok(!e.path);
-      return;
-    }
-    throw new Error('no error reported when there should be');
-  });
-
-  test('is dynamic', function () {
-    fs.writeFileSync(__dirname + '/tmp/include.pjs', '<p>Old</p>');
-    var file = 'test/fixtures/include_cache.pjs'
-      , options = {filename: file}
-      , out = pjs.compile(fixture('include_cache.pjs'), options);
-    assert.equal(out(), '<p>Old</p>\n');
-
-    fs.writeFileSync(__dirname + '/tmp/include.pjs', '<p>New</p>');
-    assert.equal(out(), '<p>New</p>\n');
-  });
-
-  test('support caching', function () {
-    fs.writeFileSync(__dirname + '/tmp/include.pjs', '<p>Old</p>');
-    var file = 'test/fixtures/include_cache.pjs'
-      , options = {cache: true, filename: file}
-      , out = pjs.render(fixture('include_cache.pjs'), {}, options)
-      , expected = fixture('include_cache.html');
-    assert.equal(out, expected);
-    out = pjs.render(fixture('include_cache.pjs'), {}, options);
-    // No change, still in cache
-    assert.equal(out, expected);
-    fs.writeFileSync(__dirname + '/tmp/include.pjs', '<p>New</p>');
-    out = pjs.render(fixture('include_cache.pjs'), {}, options);
-    assert.equal(out, expected);
-  });
-
 });
 
 suite('preprocessor include', function () {
-  test('work', function () {
+  test('work', function (done) {
     var file = 'test/fixtures/include_preprocessor.pjs';
-    assert.equal(pjs.render(fixture('include_preprocessor.pjs'), {pets: users}, {filename: file, delimiter: '@'}),
-        fixture('include_preprocessor.html'));
+    pjs.render(fixture('include_preprocessor.pjs'), {pets: users}, {filename: file, delimiter: '@'}, function (err, out) {
+      assert.equal(noWC(out), noWC(fixture('include_preprocessor.html')));
+      done();
+    });
+  });
+  test('no false positives', function (done) {
+    pjs.render('<% %> include foo <% %>', function (err, out) {
+      assert.equal(out, ' include foo ');
+      done();
+    });
   });
 
-  test('no false positives', function () {
-    assert.equal(pjs.render('<% %> include foo <% %>'), ' include foo ');
-  });
-
-  test('fails without `filename`', function () {
-    try {
-      pjs.render(fixture('include_preprocessor.pjs'), {pets: users}, {delimiter: '@'});
-    }
-    catch (err) {
+  test('fails without `filename`', function (done) {
+    pjs.render(fixture('include_preprocessor.pjs'), {pets: users}, {delimiter: '@'}, function (err, out) {
       assert.ok(err.message.indexOf('requires the \'filename\' option') > -1);
-      return;
-    }
-    throw new Error('expected inclusion error');
+      done();
+    });
   });
 
-  test('strips BOM', function () {
-    assert.equal(
-      pjs.render('<% include fixtures/includes/bom.pjs %>',
-        {}, {filename: path.join(__dirname, 'f.pjs')}),
-      '<p>This is a file with BOM.</p>\n');
+  test('strips BOM', function (done) {
+    pjs.render('<% include fixtures/includes/bom.pjs %>', {}, {filename: path.join(__dirname, 'f.pjs')}, function (err, out) {
+      assert.equal(out, '<p>This is a file with BOM.</p>\n');
+      done();
+    });
   });
 
-  test('work when nested', function () {
+  test('work when nested', function (done) {
     var file = 'test/fixtures/menu_preprocessor.pjs';
-    assert.equal(pjs.render(fixture('menu_preprocessor.pjs'), {pets: users}, {filename: file}),
-        fixture('menu_preprocessor.html'));
+    pjs.render(fixture('menu_preprocessor.pjs'), {pets: users}, {filename: file}, function (err, out) {
+      assert.equal(noWC(out), noWC(fixture('menu_preprocessor.html')));
+      done();
+    });
   });
 
-  test('tracks dependency correctly', function () {
-    var file = 'test/fixtures/menu_preprocessor.pjs'
-      , fn = pjs.compile(fixture('menu_preprocessor.pjs'), {filename: file});
-    assert(fn.dependencies.length);
-  });
-
-  test('include arbitrary files as-is', function () {
+  test('include arbitrary files as-is', function (done) {
     var file = 'test/fixtures/include_preprocessor.css.pjs';
-    assert.equal(pjs.render(fixture('include_preprocessor.css.pjs'), {pets: users}, {filename: file}),
-        fixture('include_preprocessor.css.html'));
+    pjs.render(fixture('include_preprocessor.css.pjs'), {pets: users}, {filename: file}, function (err, out) {
+      assert.equal(noWC(out), noWC(fixture('include_preprocessor.css.html')));
+      done();
+    });
   });
 
-  test('pass compileDebug to include', function () {
+  test('pass compileDebug to include', function (done) {
     var file = 'test/fixtures/include_preprocessor.pjs'
       , fn;
     fn = pjs.compile(fixture('include_preprocessor.pjs'), {
@@ -724,84 +609,56 @@ suite('preprocessor include', function () {
     , delimiter: '@'
     , compileDebug: false
     });
-    try {
-      // Render without a required variable reference
-      fn({foo: 'asdf'});
-    }
-    catch(e) {
-      assert.equal(e.message, 'pets is not defined');
-      assert.ok(!e.path);
-      return;
-    }
-    throw new Error('no error reported when there should be');
+    // Render without a required variable reference
+    fn({foo: 'asdf'}, function (err) {
+      assert.ok(err.message.indexOf('pets is not defined') > -1);
+      assert.ok(!err.path);
+      done();
+    });
   });
 
-  test('is static', function () {
+  test('is static', function (done) {
     fs.writeFileSync(__dirname + '/tmp/include_preprocessor.pjs', '<p>Old</p>');
     var file = 'test/fixtures/include_preprocessor_cache.pjs'
       , options = {filename: file}
-      , out = pjs.compile(fixture('include_preprocessor_cache.pjs'), options);
-    assert.equal(out(), '<p>Old</p>\n');
-
-    fs.writeFileSync(__dirname + '/tmp/include_preprocessor.pjs', '<p>New</p>');
-    assert.equal(out(), '<p>Old</p>\n');
+      , render = pjs.compile(fixture('include_preprocessor_cache.pjs'), options);
+    render(function (err, out) {
+      assert.equal(out, '<p>Old</p>');
+      fs.writeFileSync(__dirname + '/tmp/include_preprocessor.pjs', '<p>New</p>');
+      render(function (err, out) {
+        assert.equal(out, '<p>Old</p>');
+        done();
+      });
+    });
   });
 
-  test('support caching', function () {
+  test('support caching', function (done) {
     fs.writeFileSync(__dirname + '/tmp/include_preprocessor.pjs', '<p>Old</p>');
     var file = 'test/fixtures/include_preprocessor_cache.pjs'
       , options = {cache: true, filename: file}
-      , out = pjs.render(fixture('include_preprocessor_cache.pjs'), {}, options)
       , expected = fixture('include_preprocessor_cache.html');
-    assert.equal(out, expected);
-    fs.writeFileSync(__dirname + '/tmp/include_preprocessor.pjs', '<p>New</p>');
-    out = pjs.render(fixture('include_preprocessor_cache.pjs'), {}, options);
-    assert.equal(out, expected);
-  });
-
-});
-
-suite('comments', function () {
-  test('fully render with comments removed', function () {
-    assert.equal(pjs.render(fixture('comments.pjs')),
-        fixture('comments.html'));
-  });
-});
-
-suite('require', function () {
-
-  // Only works with inline/preprocessor includes
-  test('allow pjs templates to be required as node modules', function () {
-      var file = 'test/fixtures/include_preprocessor.pjs'
-        , template = require(__dirname + '/fixtures/menu_preprocessor.pjs');
-      if (!process.env.running_under_istanbul) {
-        assert.equal(template({filename: file, pets: users}),
-          fixture('menu_preprocessor.html'));
-      }
-  });
-});
-
-suite('examples', function () {
-  function noop () {}
-  fs.readdirSync('examples').forEach(function (f) {
-    if (!/\.js$/.test(f)) {
-      return;
-    }
-    suite(f, function () {
-      test('doesn\'t throw any errors', function () {
-        var stderr = hook_stdio(process.stderr, noop)
-          , stdout = hook_stdio(process.stdout, noop);
-        try {
-          require('../examples/' + f);
-        }
-        catch (ex) {
-          stdout();
-          stderr();
-          throw ex;
-        }
-        stdout();
-        stderr();
+    pjs.render(fixture('include_preprocessor_cache.pjs'), {}, options, function (err, out) {
+      assert.equal(noWC(out), noWC(expected));
+      fs.writeFileSync(__dirname + '/tmp/include_preprocessor.pjs', '<p>New</p>');
+      pjs.render(fixture('include_preprocessor_cache.pjs'), {}, options, function (err, out) {
+        assert.equal(noWC(out), noWC(expected));
+        done();
       });
+    });
+  });
+
+  test('Recursive include error handling', function (done) {
+    pjs.renderFile('test/fixtures/include_preprocessor_recursive.pjs', function (err, out) {
+      assert.ok(err);
+      done();
+    });
+  });
+});
+suite('comments', function () {
+  test('fully render with comments removed', function (done) {
+    pjs.render(fixture('comments.pjs'), function (err, out) {
+      assert.equal(noWC(out), noWC(fixture('comments.html')));
+      done();
     });
   });
 });

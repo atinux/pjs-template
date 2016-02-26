@@ -123,7 +123,3 @@ pjs.render('<$= users.join(" | "); $>', { users: users }, function (err, html) {
 - pjs.compile(str [, opts])
 - pjs.clearCache()
 - pjs.escape(html)
-
-## Todos
-- Tests with Mocha and Istanbul for coverage
-- Npm badge, Travis, Bithound + Issues Stats

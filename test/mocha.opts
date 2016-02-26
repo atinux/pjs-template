@@ -1,3 +1,4 @@
 --ui tdd
 --reporter spec
 --check-leaks
+--timeout=10000ms
