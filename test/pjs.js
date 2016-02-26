@@ -203,7 +203,7 @@ suite('pjs.render(str, data, opts)', function () {
   test('data object renders something raw', function (done) {
     pjs.render('<%- { foo: true } %>', function (err, out) {
       assert.equal(typeof out, 'object');
-      assert.ok(out.foo)
+      assert.ok(out.foo);
       done();
     });
   });
@@ -211,7 +211,7 @@ suite('pjs.render(str, data, opts)', function () {
   test('data object renders something raw with EOL', function (done) {
     pjs.render('\n<%- { bar: 10 } %>\n', function (err, out) {
       assert.equal(typeof out, 'object');
-      assert.equal(out.bar, 10)
+      assert.equal(out.bar, 10);
       done();
     });
   });
@@ -224,8 +224,8 @@ suite('pjs.render(str, data, opts)', function () {
   });
 
   test('support caching', function (done) {
-    var file = __dirname + '/tmp/render.pjs'
-      , options = { cache: true, filename: file };
+    var file = __dirname + '/tmp/render.pjs',
+        options = { cache: true, filename: file };
 
     async.waterfall([
       function (next) {
@@ -253,9 +253,9 @@ suite('pjs.render(str, data, opts)', function () {
   });
 
   test('no error if caching and watchFiles but no real file', function (done) {
-    var file = __dirname + '/tmp/render2.pjs'
-      , options = { cache: true, watchFiles: true, filename: file }
-      , expected = '<p>Old</p>';
+    var file = __dirname + '/tmp/render2.pjs',
+        options = { cache: true, watchFiles: true, filename: file },
+        expected = '<p>Old</p>';
 
     pjs.render('<p>Old</p>', {}, options, function (err, out) {
       assert.equal(err, null);
@@ -280,8 +280,8 @@ suite('pjs.renderFile(path, [data], [options], fn)', function () {
   });
 
   test('accept locals', function(done) {
-    var data =  { name: 'fonebone' }
-      , options = { delimiter: '$' };
+    var data =  { name: 'fonebone' },
+        options = { delimiter: '$' };
     pjs.renderFile('test/fixtures/user.pjs', data, options, function(err, out) {
       assert.equal(out, '<h1>fonebone</h1>');
       done();
@@ -289,9 +289,9 @@ suite('pjs.renderFile(path, [data], [options], fn)', function () {
   });
 
   test('support basic caching', function (done) {
-    var expected = '<p>Old</p>'
-      , file = __dirname + '/tmp/renderFile.pjs'
-      , options = { cache: true };
+    var expected = '<p>Old</p>',
+        file = __dirname + '/tmp/renderFile.pjs',
+        options = { cache: true };
 
     fs.writeFileSync(file, '<p>Old</p>');
     pjs.renderFile(file, {}, options, function (err, out) {
@@ -306,8 +306,8 @@ suite('pjs.renderFile(path, [data], [options], fn)', function () {
   });
 
   test('support smart caching (watchFiles: true)', function (done) {
-    var file = __dirname + '/tmp/renderFile.pjs'
-      , options = { cache: true, watchFiles: true };
+    var file = __dirname + '/tmp/renderFile.pjs',
+        options = { cache: true, watchFiles: true };
 
     pjs.clearCache();
     fs.writeFileSync(file, '<p>Old #2</p>');
@@ -328,9 +328,9 @@ suite('pjs.renderFile(path, [data], [options], fn)', function () {
 
 suite('cache specific', function () {
   test('`clearCache` work properly', function (done) {
-    var expected = '<p>Old</p>'
-      , file = __dirname + '/tmp/clearCache.pjs'
-      , options = {cache: true, filename: file};
+    var expected = '<p>Old</p>',
+        file = __dirname + '/tmp/clearCache.pjs',
+        options = {cache: true, filename: file};
 
     pjs.render('<p>Old</p>', {}, options, function (err, out) {
       assert.equal(out, expected);
@@ -422,17 +422,17 @@ suite('-%>', function () {
   });
   test('stack traces work', function (done) {
     pjs.render(fixture('no.newlines.error.pjs'), function (err, out) {
-      assert.notEqual(err.message.indexOf('>> 4| <%= qdata %>'), -1)
+      assert.notEqual(err.message.indexOf('>> 4| <%= qdata %>'), -1);
       done();
     });
   });
 
   test('works with unix style', function (done) {
-    var content = "<ul><% -%>\n"
-    + "<% users.forEach(function(user){ -%>\n"
-    + "<li><%= user.name -%></li>\n"
-    + "<% }) -%>\n"
-    + "</ul><% -%>\n";
+    var content = "<ul><% -%>\n" +
+        "<% users.forEach(function(user){ -%>\n" +
+        "<li><%= user.name -%></li>\n" +
+        "<% }) -%>\n" +
+        "</ul><% -%>\n";
 
     var expectedResult = "<ul><li>geddy</li>\n<li>neil</li>\n<li>alex</li>\n</ul>";
     var fn;
@@ -444,11 +444,11 @@ suite('-%>', function () {
   });
 
   test('works with windows style', function (done) {
-    var content = "<ul><% -%>\r\n"
-    + "<% users.forEach(function(user){ -%>\r\n"
-    + "<li><%= user.name -%></li>\r\n"
-    + "<% }) -%>\r\n"
-    + "</ul><% -%>\r\n";
+    var content = "<ul><% -%>\r\n" +
+        "<% users.forEach(function(user){ -%>\r\n" +
+        "<li><%= user.name -%></li>\r\n" +
+        "<% }) -%>\r\n" +
+        "</ul><% -%>\r\n";
 
     var expectedResult = "<ul><li>geddy</li>\r\n<li>neil</li>\r\n<li>alex</li>\r\n</ul>";
     var fn;
@@ -602,12 +602,12 @@ suite('preprocessor include', function () {
   });
 
   test('pass compileDebug to include', function (done) {
-    var file = 'test/fixtures/include_preprocessor.pjs'
-      , fn;
+    var file = 'test/fixtures/include_preprocessor.pjs',
+        fn;
     fn = pjs.compile(fixture('include_preprocessor.pjs'), {
-      filename: file
-    , delimiter: '@'
-    , compileDebug: false
+      filename: file,
+      delimiter: '@',
+      compileDebug: false
     });
     // Render without a required variable reference
     fn({foo: 'asdf'}, function (err) {
@@ -619,9 +619,9 @@ suite('preprocessor include', function () {
 
   test('is static', function (done) {
     fs.writeFileSync(__dirname + '/tmp/include_preprocessor.pjs', '<p>Old</p>');
-    var file = 'test/fixtures/include_preprocessor_cache.pjs'
-      , options = {filename: file}
-      , render = pjs.compile(fixture('include_preprocessor_cache.pjs'), options);
+    var file = 'test/fixtures/include_preprocessor_cache.pjs',
+        options = {filename: file},
+        render = pjs.compile(fixture('include_preprocessor_cache.pjs'), options);
     render(function (err, out) {
       assert.equal(out, '<p>Old</p>');
       fs.writeFileSync(__dirname + '/tmp/include_preprocessor.pjs', '<p>New</p>');
@@ -634,9 +634,9 @@ suite('preprocessor include', function () {
 
   test('support caching', function (done) {
     fs.writeFileSync(__dirname + '/tmp/include_preprocessor.pjs', '<p>Old</p>');
-    var file = 'test/fixtures/include_preprocessor_cache.pjs'
-      , options = {cache: true, filename: file}
-      , expected = fixture('include_preprocessor_cache.html');
+    var file = 'test/fixtures/include_preprocessor_cache.pjs',
+        options = {cache: true, filename: file},
+        expected = fixture('include_preprocessor_cache.html');
     pjs.render(fixture('include_preprocessor_cache.pjs'), {}, options, function (err, out) {
       assert.equal(noWC(out), noWC(expected));
       fs.writeFileSync(__dirname + '/tmp/include_preprocessor.pjs', '<p>New</p>');
